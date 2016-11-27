@@ -28,6 +28,8 @@ Not much of a installation routing right now. Just clone the repo and copy the `
 
 ### Perfuse.makeObservable(thing)
 
+Makes a JavaScript object *or* an array of objects completely observable.
+
 ```javascript
 var Perfuse = require("Perfuse");
 
@@ -35,6 +37,8 @@ var items = Perfuse.makeObservable(thing);
 ```
 
 ### Perfuse.makePersistable(thing)
+
+Converts an observable JavaScript object *or* array back to a plain object.
 
 ```javascript
 var Perfuse = require("Perfuse");
