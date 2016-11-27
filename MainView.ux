@@ -1,0 +1,28 @@
+<App>
+    <JavaScript File="Main.js" />
+
+    <ClientPanel>
+        <Text Value="Perfuse Example" Dock="Top" FontSize="34" Alignment="Center"/>
+        <ScrollView>
+            <StackPanel>
+                <Each Items="{items}">
+                    <StackPanel Margin="8" Padding="8" Orientation="Vertical">
+                        <Clicked>
+                            <Callback Handler="{changeFirstName}" />
+                        </Clicked>
+                        <Text Value="{first_name}" Color="White"/>
+                        <Text Value="{last_name}" Color="White" FontSize="24"/>
+                        <Text Value="{complex.test}" />
+                        <StackPanel>
+                            <Text Value="Array" />
+                            <Each Items="{array}">
+                                <Text Value="{name}"/>
+                            </Each>
+                        </StackPanel>
+                        <Rectangle Color="#3377AA" Layer="Background"/>
+                    </StackPanel>
+                </Each>
+            </StackPanel>
+        </ScrollView>
+    </ClientPanel>
+</App>
