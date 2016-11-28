@@ -1,11 +1,19 @@
-var Observable = require("FuseJS/Observable")
+/**
 
-var getType = function (elem) {
-  return Object.prototype.toString.call(elem).slice(8, -1);
+    Version: 0.1
+
+**/
+
+var Observable = require("FuseJS/Observable")
+var log = require("Utils").log;
+var _ = require("lodash");
+
+var getType = function(elem) {
+    return Object.prototype.toString.call(elem).slice(8, -1);
 };
 
-var isObject = function (elem) {
-  return getType(elem) === 'Object';
+var isObject = function(elem) {
+    return getType(elem) === 'Object';
 };
 
 var Perfuse = {
@@ -64,39 +72,51 @@ var Perfuse = {
     },
 
     makePersistable: function(obj) {
-        if (obj instanceof Array) {
-            var arr = [];
-
-            for (var i = 0; i < obj.length; i++) {
-                arr.push(this.makePersistable(obj[i]));
+        if (_.has(obj, "_isLeaf")) {
+            // is it an observable list
+            // get values and then go over all elements --> makePersistable
+            if (obj._values.length > 1) {
+                var unpackedArray = _.clone(obj._values);
+                for (var i = 0; i < unpackedArray.length; i++) {
+                    unpackedArray[i] = this.makePersistable(unpackedArray[i]);
+                }
+                return unpackedArray;
             }
-
-            return arr;
-        }
-
-        for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-                if (obj[property] instanceof Observable) {
-                    if (obj[property].length <= 1) {
-                        obj[property] = obj[property].value
-                    } else {
-                        // we have a list
-                        var arr = [];
-                        for (var i = 0; i < obj[property].length; i++) {
-                            arr.push(this.makePersistable(obj[property].getAt(i)));
-                        }
-
-                        obj[property] = arr;
+            // is it an observable
+            // get value and then go over all properties --> makePersistable
+            else {
+                var unpackedObj = obj.value;
+                for (var prop in unpackedObj) {
+                    if (unpackedObj.hasOwnProperty(prop)) {
+                        unpackedObj[prop] = this.makePersistable(unpackedObj[prop]);
                     }
                 }
-
-                if (isObject(obj[property])) {
-                    obj[property] = this.makePersistable(obj[property]);
+                return unpackedObj;
+            }
+        } else if (obj instanceof Array) {
+            // is it a normal Array
+            // go over all elements --> makePersistable
+            var clonedArray = _.clone(obj);
+            for (var i = 0; i < clonedArray.length; i++) {
+                clonedArray[i] = this.makePersistable(clonedArray[i]);
+            }
+            return clonedArray;
+        } else if (isObject(obj)) {
+            // is it a normal object
+            // go over all properties --> makePersistable
+            var clonedObj = _.clone(obj)
+            for (var prop in clonedObj) {
+                if (clonedObj.hasOwnProperty(prop)) {
+                    clonedObj[prop] = this.makePersistable(clonedObj[prop]);
                 }
             }
+            return clonedObj;
+        } else {
+            // is it a value type? --> return value
+            // return value
+            var clonedObj = _.clone(obj);
+            return clonedObj;
         }
-
-        return obj;
     }
 }
 

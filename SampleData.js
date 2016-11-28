@@ -1,7 +1,7 @@
 var data = [{
-    "_ignore": ["last_name"],
+    "_ignore": ["array"],
     "id": 1,
-    "first_name": "FRITT",
+    "first_name": "FRANZ",
     "last_name": "Spencer",
     "array": [{
         "_ignore": ["name"],
@@ -19,6 +19,12 @@ var data = [{
     }
 }]
 
+var easyData = {
+    "name": "ASDASD",
+    "age": 23
+}
+
 module.exports = {
-    data
+    data,
+    easyData
 }
