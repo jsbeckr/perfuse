@@ -5,33 +5,37 @@ var log = require("Utils").log
 var Perfuse = require("Perfuse")
 
 var items = Perfuse.makeObservable(data);
-
-// var foo = Perfuse.makeObservable(easyData);
-// log("easyData obs", foo);
-// var bar = Perfuse.makePersistable(foo);
-// log("easyData pers", bar);
+log("items", items);
 
 var changeFirstName = function(object) {
     var item = object.data;
     log("observable", item)
     var persi = Perfuse.makePersistable(item);
-    persi.array.push("CLONE TEST");
     log("persistable", persi)
-    log("observable", item)
 }
 
 var foo = {
-    asd: 2,
-    das: Observable(3),
-    test: Observable({
-        name: Observable("asdasd")
+    array: Observable([2,3,4]),
+    obs: Observable({
+        test: Observable({
+            prop1: 2,
+            prop2: "qwe"
+        })
     }),
-    array: [2,5,4,2],
-    obsArray: Observable("test","LDAS", Observable("dfasd"))
-}
-log("FOO", foo);
-var bar = Perfuse.makePersistable(foo);
-log("bar", bar);
+    strArray: ["qwe", "werw2", "asda"],
+    objArray: [{
+        prop1: 2
+    }, {
+        prop1: 3,
+        prop2: "Peter"
+    }]
+};
+
+// log("foo", foo)
+// var bar = Perfuse.makeObservable(foo);
+// log("bar", bar);
+// var foo2 = Perfuse.makePersistable(bar);
+// log("foo2", foo2);
 
 module.exports = {
     items: items,

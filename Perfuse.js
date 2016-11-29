@@ -18,57 +18,79 @@ var isObject = function(elem) {
 
 var Perfuse = {
     makeObservable: function(obj) {
-        // Nothing todo here
-        if (obj instanceof Observable) {
-            return obj;
-        }
-
-        // lets get the ignored properties
-        var ignored = obj._ignore;
-
-        // if we get an array make it and all its items observable
-        if (obj instanceof Array) {
-            var arr = Observable();
-
-            for (var i = 0; i < obj.length; i++) {
-                arr.add(this.makeObservable(obj[i]));
+        if (_.has(obj, "_isLeaf")) {
+            // list of observables
+            // get all values --> makeObservable
+            if (obj._values.length > 1) {
+                var unpackedArray = obj._values;
+                for (var i = 0; i < unpackedArray.length; i++) {
+                    if (isObject(unpackedArray[i])) {
+                        unpackedArray[i] = this.makeObservable(unpackedArray[i]);
+                    }
+                }
+                return Observable(unpackedArray);
             }
+            // simple observable
+            // .value --> makeObservable pro
+            else {
+                var unpackedObj = obj.value;
 
-            return arr;
-        }
-
-        for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-                // lets ignore private stuff
-                if (property.charAt(0) == '_') {
-                    continue;
+                // Special case if the unpacked value is an array
+                // --> mimic Observable behavior
+                if (unpackedObj instanceof Array) {
+                    for (var i = 0; i < unpackedObj.length; i++) {
+                        // if array element is an object --> make it observable
+                        if (isObject(unpackedObj[i])) {
+                            unpackedObj[i] = this.makeObservable(unpackedObj[i]);
+                        }
+                    }
+                    return Observable(unpackedObj);
                 }
 
-                // Nothing todo here
-                if (obj[property] instanceof Observable) {
-                    continue;
-                }
+                for (var prop in unpackedObj) {
+                    if (unpackedObj.hasOwnProperty(prop)) {
+                        // let's ignore private stuff
+                        if (prop.charAt(0) === "_") {
+                            continue;
+                        }
 
-                // if the property is ignored... ignore it
-                if (ignored != null && ignored.indexOf(property) !== -1) {
-                    continue;
+                        unpackedObj[prop] = this.makeObservable(unpackedObj[prop]);
+                    }
                 }
-
-                if (obj[property] instanceof Array) {
-                    obj[property] = this.makeObservable(obj[property])
-                    continue;
-                }
-
-                if (isObject(obj[property])) {
-                    obj[property] = Observable(this.makeObservable(obj[property]));
-                    continue;
-                }
-
-                obj[property] = Observable(obj[property])
+                return Observable(unpackedObj);
             }
-        }
+        } else if (obj instanceof Array) {
+            // array
+            // clone array --> makeObservable foreach
+            var clonedArr = _.clone(obj);
+            for (var i = 0; i < clonedArr.length; i++) {
+                // if array element is an object --> make it observable
+                if (isObject(clonedArr[i])) {
+                    clonedArr[i] = this.makeObservable(clonedArr[i]);
+                }
+            }
+            var dummyObservable = Observable();
+             dummyObservable.addAll(clonedArr);
+            return dummyObservable;
+        } else if (isObject(obj)) {
+            // simple object
+            // clone object --> makeObservable foreach property
+            var clonedObj = _.clone(obj);
+            for (var prop in clonedObj) {
+                if (clonedObj.hasOwnProperty(prop)) {
+                    // let's ignore private stuff
+                    if (prop.charAt(0) === "_") {
+                        continue;
+                    }
 
-        return obj;
+                    clonedObj[prop] = this.makeObservable(clonedObj[prop]);
+                }
+            }
+            return Observable(clonedObj);
+        } else {
+            // simple value Observable(obj)
+            return Observable(obj);
+        }
     },
 
     makePersistable: function(obj) {
@@ -76,7 +98,7 @@ var Perfuse = {
             // is it an observable list
             // get values and then go over all elements --> makePersistable
             if (obj._values.length > 1) {
-                var unpackedArray = _.clone(obj._values);
+                var unpackedArray = obj._values;
                 for (var i = 0; i < unpackedArray.length; i++) {
                     unpackedArray[i] = this.makePersistable(unpackedArray[i]);
                 }
