@@ -4,11 +4,15 @@ Having a JavaScript object or an array of objects and turning them into Fuse obs
 
 Maybe Perfuse can help you with that!
 
+## Disclaimer
+
+**ignoring** disabled until next commit!
+
 ## Installation
 
 Not much of a installation routing right now. Just clone the repo and copy the `Perfuse.js` to your project.
 
-**Don't forget to add all .js files to your bundle** 
+**Don't forget to add all .js files to your bundle**
 
 ```javascript
 {
@@ -175,6 +179,7 @@ var items = Perfuse.makeObservable(data);
 ## Todos
 
 - [ ] Tests :grin:
+- [ ] Reimplement ignoring
 - [ ] Globally ignore properties (useful for arrays)
 - [ ] Support for Observable functions
 - [ ] Support Fuse Package Management once it is released
